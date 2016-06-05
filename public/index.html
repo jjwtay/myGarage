@@ -1,0 +1,62 @@
+<html>
+<head></head>
+<body>
+    <h1 id="status"></h1>
+    <button onclick="setGarage(true)">Open</button>
+    <button onclick="setGarage(false)">Close</button>
+    <script>
+        let status = document.getElementById("status"),
+            form = document.getElementById("form")
+        setStatus()
+        
+        function setGarage(val) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    setStatus()
+                }
+            }
+            xhttp.open("POST", "http://localhost:8001/open", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("open=" + val);
+            /*form.setAttribute("open", val)
+            form.submit()
+            setStatus()*/
+        }
+        
+        function setStatus() {
+            get("http://localhost:8001/open").then(val => {
+                let resp = JSON.parse(val), currentState
+                if(resp.open) {
+                    currentState = "OPEN"
+                } else {
+                    currentState = "CLOSED"
+                }
+                status.innerHTML = currentState
+            })
+        }
+        function get(url) {
+            return new Promise(function(resolve, reject) {
+                var req = new XMLHttpRequest();
+                req.open('GET', url);
+
+                req.onload = function() {
+                    if (req.status == 200) {
+                        resolve(req.response);
+                    }
+                    else {
+                        reject(Error(req.statusText));
+                    }
+                }
+
+                req.onerror = function() {
+                    reject(Error("Network Error"));
+                }
+
+                req.send()
+            })
+        }        
+    </script>
+    
+</body>
+</html>

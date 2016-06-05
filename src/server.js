@@ -6,12 +6,14 @@ var express = require('express'),
     io = require('socket.io')(server),
     port = 8001,
     socketPort = 8002,
-    bodyParser = require('body-parser')
+    bodyParser = require('body-parser'),
+    path = require('path')
     
 
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.static('public'))
 
 io.set('transports', [ 'websocket' ]);
 
@@ -21,9 +23,7 @@ app.all('/', (req, res, next) => {
     next()
 })
 
-app.get('/', (req, res) => {
-    res.send("Hello from the garage")
-})
+
 app.get('/open', (req, res) => open.getOpen(req, res))
 app.post('/open', (req, res) => open.setOpen(req, res))
 
